@@ -3,13 +3,38 @@
    Referências bíblicas citadas por livro, capítulo e versículo; os trechos narrativos são paráfrases. */
 
 const STATS = {
-  fe:   { nome: 'Fé',          icone: '✦', cor: '#f2c96b', desc: 'Comunhão com Deus e firmeza interior. Fé baixa enfraquece suas decisões difíceis.' },
-  sab:  { nome: 'Sabedoria',   icone: '❖', cor: '#9fd0ff', desc: 'Conhecimento das Escrituras e discernimento. Ajuda a ler o momento.' },
-  seg:  { nome: 'Seguidores',  icone: '☗', cor: '#b8e28f', desc: 'Pessoas que acompanham você e acolhem a mensagem.' },
-  prov: { nome: 'Provisões',   icone: '⚱', cor: '#e2b48f', desc: 'Alimento, abrigo e recursos para a jornada. Abaixo de 0, a fadiga consome sua Fé.' },
-  inf:  { nome: 'Influência',  icone: '☼', cor: '#ffd98a', desc: 'Alcance da mensagem nas cidades e regiões.' },
-  opo:  { nome: 'Oposição',    icone: '⚔', cor: '#ff8a7a', desc: 'Atenção hostil de autoridades religiosas, Herodes ou Roma. Em 100, você é detido antes da hora.' }
+  fe:   { nome: 'Fé',          cor: '#f2c96b', desc: 'Comunhão com Deus e firmeza interior. Fé baixa enfraquece suas decisões difíceis.' },
+  sab:  { nome: 'Sabedoria',   cor: '#9fd0ff', desc: 'Conhecimento das Escrituras e discernimento. Ajuda a ler o momento.' },
+  seg:  { nome: 'Seguidores',  cor: '#b8e28f', desc: 'Pessoas que acompanham você e acolhem a mensagem.' },
+  prov: { nome: 'Provisões',   cor: '#e2b48f', desc: 'Alimento, abrigo e recursos para a jornada. Abaixo de 0, a fadiga consome sua Fé.' },
+  inf:  { nome: 'Influência',  cor: '#ffd98a', desc: 'Alcance da mensagem nas cidades e regiões.' },
+  opo:  { nome: 'Oposição',    cor: '#ff8a7a', desc: 'Atenção hostil de autoridades religiosas, Herodes ou Roma. Em 100, você é detido antes da hora.' }
 };
+
+
+/* Ícones em SVG (não dependem de fontes de emoji do sistema) */
+const ICO = (() => {
+  const p = {
+    fe:   '<path d="M12 2l2.4 6.9H22l-6 4.6 2.3 7.1L12 16.2 5.7 20.6 8 13.5 2 8.9h7.6z"/>',
+    sab:  '<path d="M4 4h6a3 3 0 013 3v13a2 2 0 00-2-2H4zM20 4h-6a3 3 0 00-3 3v13a2 2 0 012-2h7z"/>',
+    seg:  '<circle cx="8" cy="8" r="3.2"/><circle cx="16.5" cy="9" r="2.6"/><path d="M2 20c0-3.6 2.7-6 6-6s6 2.4 6 6zM13.5 20c.2-2.4-.6-4.3-2-5.6 1.4-.9 3-1.1 4.6-.8 2.7.5 4.9 2.8 4.9 6.4z"/>',
+    prov: '<path d="M9 2h6v3l3 4v11a2 2 0 01-2 2H8a2 2 0 01-2-2V9l3-4z"/>',
+    inf:  '<circle cx="12" cy="12" r="4.2"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M4.2 19.8L7 17M17 7l2.8-2.8" stroke="currentColor" stroke-width="2" fill="none"/>',
+    opo:  '<path d="M3 3l8 8-2 2 2 2-2 2-2-2-2 2-2-2 2-2-2-2zM21 3l-8 8 2 2-2 2 2 2 2-2 2 2 2-2-2-2 2-2z"/>',
+    fid:  '<path d="M10 2h4v6h6v4h-6v10h-4V12H4V8h6z"/>',
+    salvar: '<path d="M4 3h13l4 4v14H3V3zm3 2v5h9V5zm5 9a3 3 0 100 6 3 3 0 000-6z"/>',
+    somon: '<path d="M3 9h4l5-4v14l-5-4H3z"/><path d="M15.5 8.5a5 5 0 010 7M18 6a8.5 8.5 0 010 12" stroke="currentColor" stroke-width="2" fill="none"/>',
+    somoff:'<path d="M3 9h4l5-4v14l-5-4H3z"/><path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" fill="none"/>',
+    menu: '<path d="M3 5h18v2.5H3zM3 10.75h18v2.5H3zM3 16.5h18V19H3z"/>',
+    rolo: '<path d="M5 3h11a3 3 0 013 3v12a3 3 0 01-3 3H8a3 3 0 01-3-3V5H3V3zm3 5v2h8V8zm0 4v2h8v-2z"/>',
+    local:'<path d="M12 2a7 7 0 017 7c0 5-7 13-7 13S5 14 5 9a7 7 0 017-7zm0 4.5A2.5 2.5 0 1012 11.5 2.5 2.5 0 0012 6.5z"/>',
+    alerta:'<path d="M12 2l10.5 19h-21zm-1.2 7v6h2.4V9zm0 8v2.4h2.4V17z"/>',
+    lupa: '<path d="M10 3a7 7 0 015.6 11.2l5.6 5.6-1.8 1.8-5.6-5.6A7 7 0 1110 3zm0 2.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z"/>',
+    ok:   '<path d="M9 16.2l-4.2-4.2L3.4 13.4 9 19 21 7l-1.4-1.4z"/>',
+    desvio:'<path d="M12 5V1L7 6l5 5V7a5 5 0 11-5 5H5a7 7 0 107-7z"/>'
+  };
+  return n => `<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${p[n] || ''}</svg>`;
+})();
 
 const LOCAIS = {
   israel: {

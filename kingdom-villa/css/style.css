@@ -166,3 +166,9 @@ a { color: var(--ouro); }
 
 .bt:not(.sec) .ef { background: rgba(42,26,5,.12); color: #2a1a05; font-weight: 600; }
 .baixar { margin-top: 18px; font-size: .85em; opacity: .9; }
+.ic { width: 1em; height: 1em; vertical-align: -0.14em; display: inline-block; }
+.ico .ic { width: 18px; height: 18px; vertical-align: middle; color: var(--pergaminho); }
+.st span .ic { color: inherit; }
+.st-fe span { color: #f2c96b; } .st-sab span { color: #9fd0ff; } .st-seg span { color: #b8e28f; } .st-prov span { color: #e2b48f; } .st-inf span { color: #ffd98a; } .st-opo span { color: #ff8a7a; } .st-fid span { color: #d9c4ff; }
+.aviso-cons b .ic, .curio b .ic { margin-right: 4px; }
+.som-dica { position: fixed; right: 16px; bottom: 16px; z-index: 40; background: rgba(20,15,32,.9); border: 1px solid var(--ouro); color: var(--pergaminho); padding: 8px 14px; border-radius: 10px; font: inherit; cursor: pointer; }

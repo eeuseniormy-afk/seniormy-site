@@ -24,8 +24,8 @@ const Musica = (() => {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     ctx = new AC();
-    master = ctx.createGain(); master.gain.value = mudo ? 0 : volume * 0.5;
-    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 3;
+    master = ctx.createGain(); master.gain.value = mudo ? 0 : volume * 1.4;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; comp.knee.value = 10;
     master.connect(comp); comp.connect(ctx.destination);
     // reverberação de sala de pedra
     verb = ctx.createConvolver();
@@ -42,7 +42,7 @@ const Musica = (() => {
 
   function drone(tema) {
     const g = ctx.createGain(); g.gain.value = 0;
-    g.gain.linearRampToValueAtTime(0.11, ctx.currentTime + 4);
+    g.gain.setValueAtTime(0, ctx.currentTime); g.gain.linearRampToValueAtTime(0.16, ctx.currentTime + 2.5);
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.Q.value = 0.7;
     const lfo = ctx.createOscillator(); lfo.frequency.value = 0.07; const lg = ctx.createGain(); lg.gain.value = 180; lfo.connect(lg); lg.connect(lp.frequency); lfo.start();
     const oscs = [lfo];
@@ -62,7 +62,7 @@ const Musica = (() => {
     o1.type = 'triangle'; o2.type = 'sawtooth'; o1.frequency.value = f; o2.frequency.value = f * 1.002;
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass';
     lp.frequency.setValueAtTime(brilho * 2.2, t); lp.frequency.exponentialRampToValueAtTime(Math.max(300, brilho * 0.35), t + 0.9);
-    const g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel * 0.22, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0008, t + 2.4);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel * 0.38, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0008, t + 2.4);
     const g2 = ctx.createGain(); g2.gain.value = 0.25;
     o1.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); saida(g, 0.7, 0.5);
     o1.start(t); o2.start(t); o1.stop(t + 2.5); o2.stop(t + 2.5);
@@ -91,9 +91,21 @@ const Musica = (() => {
     n.connect(hp); hp.connect(ng); saida(ng, 0.6, 0.2); n.start(t);
   }
 
-  function tocar(nomeTema) {
+  let liberado = !!window.kvDesktop, pendente = 'menu';
+  function desbloquear() {
+    liberado = true;
     init(); if (!ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
+    if (ctx.state !== 'running') ctx.resume().catch(() => {});
+    // Safari/iOS: tocar um buffer silencioso dentro do gesto
+    try { const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(0); } catch (e) {}
+    if (!atual && pendente) { const t = pendente; pendente = null; tocar(t); }
+  }
+  ['pointerdown', 'mousedown', 'touchstart', 'keydown', 'click'].forEach(ev =>
+    window.addEventListener(ev, () => { if (!liberado || (ctx && ctx.state !== 'running')) desbloquear(); }, true));
+  function tocar(nomeTema) {
+    if (!liberado) { pendente = nomeTema; return; }
+    init(); if (!ctx) return;
+    if (ctx.state !== 'running') ctx.resume().catch(() => {});
     if (atual === nomeTema) return;
     parar(true);
     atual = nomeTema;
@@ -146,7 +158,7 @@ const Musica = (() => {
   }
 
   function efeito(tipo) {
-    init(); if (!ctx || mudo) return;
+    if (!liberado) return; init(); if (!ctx || mudo) return;
     const t = ctx.currentTime;
     if (tipo === 'clique') lira(74, t, 0.25, 2500);
     if (tipo === 'decisao') { [62, 66, 69, 74].forEach((n, i) => lira(n, t + i * 0.09, 0.4, 2200)); }
@@ -154,8 +166,8 @@ const Musica = (() => {
     if (tipo === 'lord') { [69, 76, 81].forEach((n, i) => flauta(n, t + i * 0.15, 1.6, 0.35)); }
   }
 
-  function setVolume(v) { volume = v; localStorage.setItem('kv_vol', v); if (master && !mudo) master.gain.value = v * 0.5; }
-  function alternarMudo() { mudo = !mudo; localStorage.setItem('kv_mudo', mudo ? '1' : '0'); if (master) master.gain.value = mudo ? 0 : volume * 0.5; return mudo; }
+  function setVolume(v) { volume = v; localStorage.setItem('kv_vol', v); if (master && !mudo) master.gain.value = v * 1.4; }
+  function alternarMudo() { mudo = !mudo; localStorage.setItem('kv_mudo', mudo ? '1' : '0'); if (master) master.gain.value = mudo ? 0 : volume * 1.4; if (!mudo) desbloquear(); return mudo; }
 
-  return { tocar, parar, efeito, setVolume, alternarMudo, get mudo() { return mudo; }, get volume() { return volume; } };
+  return { tocar, desbloquear, get liberado() { return liberado; }, parar, efeito, setVolume, alternarMudo, get mudo() { return mudo; }, get volume() { return volume; } };
 })();

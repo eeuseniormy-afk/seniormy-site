@@ -39,7 +39,7 @@
   }
   function efeitosTexto(ef) {
     return Object.entries(ef || {}).filter(([, v]) => v).map(([k, v]) =>
-      `<span class="ef ${v > 0 ? (k === 'opo' ? 'ruim' : 'bom') : (k === 'opo' ? 'bom' : 'ruim')}">${STATS[k].icone} ${STATS[k].nome} ${v > 0 ? '+' : ''}${v}</span>`).join(' ');
+      `<span class="ef ${v > 0 ? (k === 'opo' ? 'ruim' : 'bom') : (k === 'opo' ? 'bom' : 'ruim')}">${ICO(k)} ${STATS[k].nome} ${v > 0 ? '+' : ''}${v}</span>`).join(' ');
   }
   function aplicar(ef) {
     for (const k in ef) { E.stats[k] = clamp((E.stats[k] || 0) + ef[k], k === 'prov' ? -30 : 0, k === 'seg' || k === 'inf' ? 999 : 100); }
@@ -51,15 +51,15 @@
     const s = E.stats;
     return `<header class="hud">
       <div class="hud-pers"><img src="${IMG(camp().retrato)}" alt=""><div><b>${esc(camp().nome)}</b><small>Cap. ${E.cap + 1}/${camp().capitulos.length} · ${esc(cap().titulo)}</small></div></div>
-      <div class="hud-stats">${Object.keys(STATS).map(k => `<div class="st st-${k}" title="${esc(STATS[k].desc)}"><span>${STATS[k].icone}</span><b>${s[k]}</b><small>${STATS[k].nome}</small>${k !== 'seg' && k !== 'inf' ? `<i style="width:${clamp(s[k], 0, 100)}%;background:${STATS[k].cor}"></i>` : ''}</div>`).join('')}
-        <div class="st st-fid" title="Quanto sua jornada se mantém fiel ao relato bíblico."><span>✝</span><b>${E.fid}%</b><small>${rotuloFid(E.fid)}</small><i style="width:${E.fid}%;background:#d9c4ff"></i></div>
+      <div class="hud-stats">${Object.keys(STATS).map(k => `<div class="st st-${k}" title="${esc(STATS[k].desc)}"><span>${ICO(k)}</span><b>${s[k]}</b><small>${STATS[k].nome}</small>${k !== 'seg' && k !== 'inf' ? `<i style="width:${clamp(s[k], 0, 100)}%;background:${STATS[k].cor}"></i>` : ''}</div>`).join('')}
+        <div class="st st-fid" title="Quanto sua jornada se mantém fiel ao relato bíblico."><span>${ICO('fid')}</span><b>${E.fid}%</b><small>${rotuloFid(E.fid)}</small><i style="width:${E.fid}%;background:#d9c4ff"></i></div>
       </div>
-      <div class="hud-bt"><button class="ico" id="bt-salvar" title="Salvar" data-som>💾</button><button class="ico" id="bt-som" title="Som" data-som>${Musica.mudo ? '🔇' : '🔊'}</button><button class="ico" id="bt-menu" title="Menu" data-som>☰</button></div>
+      <div class="hud-bt"><button class="ico" id="bt-salvar" title="Salvar" data-som>${ICO('salvar')}</button><button class="ico" id="bt-som" title="Som" data-som>${ICO(Musica.mudo ? 'somoff' : 'somon')}</button><button class="ico" id="bt-menu" title="Menu" data-som>${ICO('menu')}</button></div>
     </header>`;
   }
   function ligarHud() {
     $('#bt-salvar')?.addEventListener('click', () => telaSalvar(true));
-    $('#bt-som')?.addEventListener('click', e => { e.target.textContent = Musica.alternarMudo() ? '🔇' : '🔊'; });
+    $('#bt-som')?.addEventListener('click', () => { $('#bt-som').innerHTML = ICO(Musica.alternarMudo() ? 'somoff' : 'somon'); });
     $('#bt-menu')?.addEventListener('click', menuPausa);
   }
   function menuPausa() {
@@ -163,7 +163,7 @@
         ${window.kvDesktop ? '<button class="bt sec" id="m-sair" data-som>Sair</button>' : ''}
         ${Nuvem.logado ? `<button class="bt sec" id="m-logout" data-som>Sair da conta (${esc(Nuvem.email || '')})</button>` : ''}
       </nav>
-      ${window.kvDesktop ? '' : `<p class="baixar">Jogue offline: <a href="https://github.com/eeuseniormy-afk/seniormy-site/releases/download/kingdom-villa-v1.0.0/TheKingdomVilla-1.0.0-Mac-Intel.zip">Mac (Intel, 10.15+)</a> · <a href="https://github.com/eeuseniormy-afk/seniormy-site/releases/download/kingdom-villa-v1.0.0/TheKingdomVilla-1.0.0-Windows-x64.zip">Windows (10/11)</a></p>`}
+      ${window.kvDesktop ? '' : `<p class="baixar">Jogue offline: <a href="https://github.com/eeuseniormy-afk/seniormy-site/releases/download/kingdom-villa-v1.0.1/TheKingdomVilla-1.0.1-Mac-Intel.zip">Mac (Intel, 10.15+)</a> · <a href="https://github.com/eeuseniormy-afk/seniormy-site/releases/download/kingdom-villa-v1.0.1/TheKingdomVilla-1.0.1-Windows-x64.zip">Windows (10/11)</a></p>`}
       <footer class="rodape">© ${LEGAL.ano} ${LEGAL.titular} — CNPJ ${LEGAL.cnpj} · Um projeto desenvolvido por ${LEGAL.estudio} · v${LEGAL.versao}</footer>
     </div>`, 'centro');
     $('#m-cont')?.addEventListener('click', () => carregar(lerSave(0)));
@@ -245,7 +245,7 @@
         <div class="cena-txt painel">
           <small class="cap-n">Capítulo ${E.cap + 1}</small>
           <h1>${esc(c.titulo)}</h1>
-          <div class="ref">📜 ${esc(c.ref)} · 📍 ${esc(LOCAIS[camp().mapa].pontos[c.local].nome)}</div>
+          <div class="ref">${ICO('rolo')} ${esc(c.ref)} · ${ICO('local')} ${esc(LOCAIS[camp().mapa].pontos[c.local].nome)}</div>
           <div id="narr" class="narr"></div>
           <button class="bt" id="seg" data-som style="visibility:hidden">Continuar</button>
         </div>
@@ -260,7 +260,7 @@
     const visitados = camp().capitulos.slice(0, E.cap + 1).map(x => x.local);
     const pts = Object.entries(M.pontos).map(([k, p]) => {
       const atual = k === c.local, vis = visitados.includes(k);
-      return `<g class="pt ${atual ? 'atual' : ''} ${vis ? 'vis' : ''}"><circle cx="${p.x}" cy="${p.y}" r="${atual ? 14 : 8}"/>${atual || vis ? `<text x="${p.x + 18}" y="${p.y + 6}">${esc(p.nome)}</text>` : ''}</g>`;
+      return `<g class="pt ${atual ? 'atual' : ''} ${vis ? 'vis' : ''}"><circle cx="${p.x}" cy="${p.y}" r="${atual ? 14 : 8}"/>${atual || vis ? (p.x > 1000 ? `<text x="${p.x - 18}" y="${p.y + 6}" text-anchor="end">${esc(p.nome)}</text>` : `<text x="${p.x + 18}" y="${p.y + 6}">${esc(p.nome)}</text>`) : ''}</g>`;
     }).join('');
     const rota = visitados.map(k => M.pontos[k]).map((p, i) => `${i ? 'L' : 'M'}${p.x},${p.y}`).join(' ');
     return `<svg class="mapa" viewBox="0 0 1408 768" preserveAspectRatio="xMidYMid slice"><image href="${IMG(M.img)}" width="1408" height="768"/>
@@ -272,7 +272,7 @@
     const A = acoesDe(E.camp);
     tela(`${hud()}
       <section class="gestao">
-        <div class="g-mapa painel">${mapaHtml()}<div class="g-local">📍 ${esc(LOCAIS[camp().mapa].pontos[c.local].nome)} · Estação ${E.turno} de ${c.turnos}</div></div>
+        <div class="g-mapa painel">${mapaHtml()}<div class="g-local">${ICO('local')} ${esc(LOCAIS[camp().mapa].pontos[c.local].nome)} · Estação ${E.turno} de ${c.turnos}</div></div>
         <div class="g-acoes painel">
           <h2>Planeje a estação</h2>
           <p class="sub">Você tem <b id="pa">${E.pa}</b> de ${PA_TURNO} esforços nesta estação.</p>
@@ -294,7 +294,7 @@
     }));
     $('#fim-turno').addEventListener('click', () => {
       if (E.pa > 0) {
-        const m = modal(`<h2>Ainda há esforços disponíveis</h2><p>Você ainda tem ${E.pa} esforço(s) nesta estação. Quer seguir mesmo assim? Tempo não usado vira descanso (+2 Fé por esforço).</p>
+        const m = modal(`<h2>Ainda há esforços disponíveis</h2><p>Você ainda tem ${E.pa} ${E.pa === 1 ? 'esforço' : 'esforços'} nesta estação. Quer seguir mesmo assim? Tempo não usado vira descanso (+2 Fé por esforço).</p>
           <div class="linha"><button class="bt" id="sim">Seguir</button><button class="bt sec" data-fechar>Voltar</button></div>`);
         $('#sim', m.el).addEventListener('click', () => { aplicar({ fe: 2 * E.pa }); m.fechar(); fimTurno(); });
       } else fimTurno();
@@ -349,7 +349,7 @@
   function confirmar(o, i) {
     const m = modal(`<h2>${o.biblico ? 'Seguir o relato' : 'Mudar o curso da história?'}</h2>
       <p class="op-escolhida">“${esc(o.txt)}”</p>
-      ${o.aviso ? `<div class="aviso-cons"><b>⚠ Consequências no transcorrer bíblico</b><p>${esc(o.aviso)}</p></div>` : ''}
+      ${o.aviso ? `<div class="aviso-cons"><b>${ICO('alerta')} Consequências para o relato bíblico</b><p>${esc(o.aviso)}</p></div>` : ''}
       <div class="analise">${analiseOpcao(o)}</div>
       <p class="prev">Efeitos previstos: ${efeitosTexto(o.ef)}</p>
       <div class="linha"><button class="bt" id="conf">Decidir</button><button class="bt sec" data-fechar>Reconsiderar</button></div>`);
@@ -379,7 +379,7 @@
           <h2>${esc(c.titulo)}</h2>
           <div id="narr" class="narr"></div>
           <p class="prev">${efeitosTexto(u.ef)} ${u.extra ? efeitosTexto(u.extra) : ''}</p>
-          <div class="curio"><b>🔎 Curiosidade histórica</b><p>${esc(c.curiosidade.txt)}</p><p class="refs">Para estudar: ${c.curiosidade.refs.map(esc).join(' · ')}</p></div>
+          <div class="curio"><b>${ICO('lupa')} Curiosidade histórica</b><p>${esc(c.curiosidade.txt)}</p><p class="refs">Para estudar: ${c.curiosidade.refs.map(esc).join(' · ')}</p></div>
           <button class="bt" id="seg" data-som>${u.fim || E.cap + 1 >= camp().capitulos.length ? 'Ver o desfecho' : 'Próximo capítulo'}</button>
         </div>
       </section>`);
@@ -399,7 +399,7 @@
     if (E.final === 'detido') F = { titulo: 'Detido antes da hora', img: cap().img, txt: ['A oposição chegou ao limite. Soldados e guardas o prenderam antes que sua missão se cumprisse.', 'Nas Escrituras, os personagens também foram perseguidos, mas a prudência os preservou até o tempo certo (Jo 7:30; At 9:23-25). Gerencie melhor a oposição na próxima jornada.'], refs: ['Jo 7:30', 'At 9:23-25', 'Mt 10:16'] };
     if (E.final === 'alternativo') {
       const desvios = E.escolhas.filter(e => !e.biblico);
-      F = { titulo: 'Uma história diferente', img: C.retrato, txt: [`Você chegou ao fim da jornada de ${C.nome}, mas por outro caminho. ${desvios.length} decisão(ões) divergiram do relato bíblico.`, 'Os desvios mudaram pessoas, lugares e o destino da mensagem. Compare abaixo o seu caminho com o das Escrituras e descubra o que estaria em jogo.', ...C.finais.biblico.txt.slice(0, 1).map(t => 'No relato bíblico: ' + t)], refs: C.finais.biblico.refs };
+      F = { titulo: 'Uma história diferente', img: C.retrato, txt: [`Você chegou ao fim da jornada de ${C.nome}, mas por outro caminho. ${desvios.length === 1 ? 'Uma decisão divergiu' : desvios.length + ' decisões divergiram'} do relato bíblico.`, 'Os desvios mudaram pessoas, lugares e o destino da mensagem. Compare abaixo o seu caminho com o das Escrituras e descubra o que estaria em jogo.', ...C.finais.biblico.txt.slice(0, 1).map(t => 'No relato bíblico: ' + t)], refs: C.finais.biblico.refs };
     }
     fundo(F.img || 'title', 0.35); Musica.tocar('final');
     const s = E.stats;
@@ -418,7 +418,7 @@
         <div class="placar"><div><b>${reino}</b><small>Pontos do Reino</small></div><div><b>${E.fid}%</b><small>${rotuloFid(E.fid)}</small></div><div><b>${finaisVistos}/${totalFinais}</b><small>Finais descobertos</small></div></div>
         <h3>Sua jornada × o relato bíblico</h3>
         <table class="linha-tempo"><tr><th>Capítulo</th><th>Sua escolha</th><th>Nas Escrituras</th></tr>
-        ${E.escolhas.map(e => `<tr class="${e.biblico ? 'ok' : 'div'}"><td>${esc(e.titulo)}<small>${esc(e.ref)}</small></td><td>${e.biblico ? '✔ ' : '↺ '}${esc(e.escolha)}</td><td>${esc(e.relato || '')}</td></tr>`).join('')}</table>
+        ${E.escolhas.map(e => `<tr class="${e.biblico ? 'ok' : 'div'}"><td>${esc(e.titulo)}<small>${esc(e.ref)}</small></td><td>${ICO(e.biblico ? 'ok' : 'desvio')} ${esc(e.escolha)}</td><td>${esc(e.relato || '')}</td></tr>`).join('')}</table>
         <div class="linha"><button class="bt" id="nova" data-som>Nova jornada</button><button class="bt sec" id="rep" data-som>Repetir ${esc(C.nome)}</button><button class="bt sec" id="men" data-som>Menu</button></div>
       </div></section>`);
     $('#nova').addEventListener('click', escolherPersonagem);
@@ -474,7 +474,6 @@
   }
 
   /* ---------------- início ---------------- */
-  document.addEventListener('click', function primeiro() { Musica.tocar(E ? camp().trilha : 'menu'); document.removeEventListener('click', primeiro); }, { once: true });
   window.addEventListener('beforeunload', autosave);
   abertura();
 })();

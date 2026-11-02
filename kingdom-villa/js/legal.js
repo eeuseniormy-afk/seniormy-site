@@ -3,7 +3,7 @@ const LEGAL = {
   titular: 'W. Carolino',
   cnpj: '69.610.819/0001-77',
   estudio: 'VillaChurch',
-  versao: '1.0.0',
+  versao: '1.0.1',
   ano: '2026',
   termos: `
 <h2>Termos de Uso e Licença de Usuário Final</h2>
