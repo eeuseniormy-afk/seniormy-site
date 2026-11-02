@@ -1,0 +1,25 @@
+name: Publish Exodus One DMG
+on:
+  push:
+    branches: [release-exodus]
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild DMG
+        run: |
+          cat parts/ExodusOne-v0.2.3.dmg.part* > ExodusOne-v0.2.3.dmg
+          echo "SHA256: $(sha256sum ExodusOne-v0.2.3.dmg)"
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete exodus-one-v0.2.3 -y --cleanup-tag || true
+          gh release create exodus-one-v0.2.3 ExodusOne-v0.2.3.dmg \
+            --target release-exodus \
+            --title "Exodus One v0.2.3 (macOS)" \
+            --notes "Exodus One v0.2.3 para macOS. DMG sem assinatura Apple: na primeira abertura, clique com o botão direito no app e escolha Abrir." \
+            --latest=false
