@@ -1,0 +1,18 @@
+name: Kingdom Villa keep-alive
+# Mantém o projeto Supabase "kingdom-villa" ativo (o plano gratuito pausa após 7 dias sem uso).
+on:
+  schedule:
+    - cron: "17 12 */3 * *"   # a cada 3 dias, 09:17 BRT
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consulta leve ao Supabase (chave pública)
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://hofwpqfbgxgdnxmxqblc.supabase.co/rest/v1/kv_saves?select=*&limit=1" \
+            -H "apikey: sb_publishable_750xSdCUkmYPdoX7iQCmoA_cQGcxVHA" \
+            -H "Authorization: Bearer sb_publishable_750xSdCUkmYPdoX7iQCmoA_cQGcxVHA")
+          echo "HTTP $code"
+          test "$code" = "200"
